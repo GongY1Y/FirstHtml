@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>扫雷</title>
+</head>
+<style>
+    #map{
+        position: absolute;
+        border: 3px #7d7d7d solid;
+        padding: 5px;
+        background-color: #878787;
+    }
+    td{
+        width: 30px;
+        height: 30px;
+        text-align: center;
+        padding: 0;
+    }
+    td:active{
+        background-color: #6E6E6E;
+    }
+</style>
+<body>
+    <div id="map"></div>
+</body>
+<script>
+    //宽高，雷数
+    const WIDTH = 39, HEIGHT = 18, COUNT = 50;
+    const BG1 = '#a0a0a0', BG2 = '#6E6E6E';
+    let mineArr = [];
+    let mineDom = document.getElementById('map');
+
+    //记录当前有多少个旗子
+    let flagCount = 0;
+
+    window.onload = function () {
+        //初始化
+        init();
+        //创建雷
+        createMine();
+        //计算方格周围有多少个雷
+        roundMineCount();
+        //渲染
+        render();
+    };
+
+    //渲染地图
+    function render(){
+        let table = document.createElement('table');
+        for(let i = 0; i < HEIGHT; i ++){
+            let tr = document.createElement('tr');
+            for(let j = 0; j < WIDTH; j ++){
+                let td = document.createElement('td');
+                td.style.backgroundColor = BG1;
+                td.id = i + "-" + j;
+                td.onclick = function(){
+                    click(i, j);
+                    success();
+                };
+                //右击插旗
+                td.oncontextmenu = function(){
+                    insertFlag(i, j);
+                    success();
+                    //防止右键菜单弹出
+                    return false;
+                };
+
+                tr.appendChild(td);
+            }
+            table.appendChild(tr);
+        }
+        mineDom.appendChild(table);
+    }
+
+    //初始化数组
+    function init() {
+        for(let i = 0; i < HEIGHT; i ++){
+            mineArr[i] = [];
+            for(let j = 0; j < WIDTH; j ++){
+                mineArr[i][j] = {isShow: false, isRadar: false, roundCount: '', isJudge: false};
+            }
+        }
+    }
+
+    //创建雷
+    function createMine() {
+        let count = 0;
+        let i;
+        let j;
+        while (count < COUNT){
+            i = Math.floor(Math.random() * HEIGHT);
+            j = Math.floor(Math.random() * WIDTH);
+            if(mineArr[i][j].isRadar === false){
+                mineArr[i][j].isRadar = true;
+                count ++;
+            }
+        }
+    }
+
+    //计算方格周围有多少个雷
+    function roundMineCount() {
+        let count = 0;
+        for(let i = 0; i < HEIGHT; i ++){
+            for(let j = 0; j < WIDTH; j ++){
+                //左上
+                if(i - 1 >= 0 && j - 1 >= 0){
+                    if(mineArr[i - 1][j - 1].isRadar){
+                        count ++;
+                    }
+                }
+                //上
+                if(i - 1 >= 0){
+                    if(mineArr[i - 1][j].isRadar){
+                        count ++;
+                    }
+                }
+                //右上
+                if(i - 1 >= 0 && j + 1 < WIDTH){
+                    if(mineArr[i - 1][j + 1].isRadar){
+                        count ++;
+                    }
+                }
+                //右
+                if(j + 1 < WIDTH){
+                    if(mineArr[i][j + 1].isRadar){
+                        count ++;
+                    }
+                }
+                //右下
+                if(i + 1 < HEIGHT && j + 1 < WIDTH){
+                    if(mineArr[i + 1][j + 1].isRadar){
+                        count ++;
+                    }
+                }
+                //下
+                if(i + 1 < HEIGHT){
+                    if(mineArr[i + 1][j].isRadar){
+                        count ++;
+                    }
+                }
+                //左下
+                if(i + 1 < HEIGHT && j - 1 >= 0){
+                    if(mineArr[i + 1][j - 1].isRadar){
+                        count ++;
+                    }
+                }
+                //左
+                if(j - 1 >= 0){
+                    if(mineArr[i][j - 1].isRadar){
+                        count ++;
+                    }
+                }
+
+                if(count > 0){
+                    mineArr[i][j].roundCount = count;
+                    count = 0;
+                }
+            }
+        }
+    }
+
+    //点击事件
+    function click(i, j){
+        let currentDom = document.getElementById(i + '-' + j);
+        let current = mineArr[i][j];
+        if(current.isRadar){
+            currentDom.style.backgroundColor = BG2;
+            currentDom.innerHTML = '<span style="color: red">❤</span>';
+            //显示所有雷
+            showAllMine();
+            alert('game over!');
+            return ;
+        }
+        showNumber(i, j);
+    }
+
+    //显示数字，递归，如果当前格子周围没有雷，就不判断自动显示
+    function showNumber(i, j) {
+        let currentDom = document.getElementById(i + '-' + j);
+        let current = mineArr[i][j];
+        console.log(current.roundCount);
+        if(!currentDom.isShow){
+            current.isShow = true;
+            // currentDom.style.backgroundColor = '#848484';
+            currentDom.style.backgroundColor = BG2;
+            currentDom.innerHTML = current.roundCount;
+            if(current.roundCount === '' && !current.isJudge){
+                current.isJudge = true;
+                //左上
+                if(i - 1 >= 0 && j - 1 >= 0){
+                    showNumber(i - 1, j - 1);
+                }
+                //上
+                if(i - 1 >= 0){
+                    showNumber(i - 1, j);
+                }
+                //右上
+                if(i - 1 >= 0 && j + 1 < WIDTH){
+                    showNumber(i - 1, j + 1);
+                }
+                //右
+                if(j + 1 < WIDTH){
+                    showNumber(i, j + 1);
+                }
+                //右下
+                if(i + 1 < HEIGHT && j + 1 < WIDTH){
+                    showNumber(i + 1, j + 1);
+                }
+                //下
+                if(i + 1 < HEIGHT){
+                    showNumber(i + 1, j);
+                }
+                //左下
+                if(i + 1 < HEIGHT && j - 1 >= 0){
+                    showNumber(i + 1, j - 1);
+                }
+                //左
+                if(j - 1 >= 0){
+                    showNumber(i, j - 1);
+                }
+            }
+        }
+    }
+
+    //显示所有雷
+    function showAllMine() {
+        for(let i = 0; i < HEIGHT; i ++){
+            for(let j = 0; j < WIDTH; j ++){
+                if(mineArr[i][j].isRadar){
+                    let currentDom = document.getElementById(i + '-' + j);
+                    currentDom.style.backgroundColor = BG2;
+                    currentDom.innerHTML = '<span style="color: red">❤</span>';
+                }
+            }
+        }
+    }
+
+    function insertFlag(i, j) {
+        let current = mineArr[i][j];
+        let currentDom = document.getElementById(i + "-" + j);
+
+        //如果已经显示了，不能插旗，旗子不能比雷多
+        if(!current.isShow && flagCount < COUNT){
+            currentDom.style.backgroundColor = BG2;
+            currentDom.innerHTML = '<span style="color: #d7d7d7">✘</span>';
+            current.isShow = true;
+            flagCount ++;
+        }
+    }
+
+    //判断游戏是否结束
+    function success() {
+        for(let i = 0; i < HEIGHT; i ++){
+            for(let j = 0; j < WIDTH; j ++){
+                if(!mineArr[i][j].isShow){
+                    return;
+                }
+            }
+        }
+        alert('success!!!');
+    }
+</script>
+</html>
