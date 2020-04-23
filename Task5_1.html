@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Task5_1</title>
+</head>
+<body>
+<script>
+    function Vehicle(xBrand, xColor) {
+        const brand = xBrand;
+        let color = xColor;
+        let speed = 0;
+
+        this.getBrand = function () {
+            return brand;
+        };
+        this.getColor = function () {
+            return color;
+        };
+        this.getSpeed = function () {
+            return speed;
+        };
+        this.setColor = function (xColor) {
+            color = xColor;
+        };
+        this.setSpeed = function (xSpeed) {
+            speed = xSpeed
+        };
+    }
+    Vehicle.prototype = {
+        constructor: Vehicle, run: function () {
+            console.log(this.getBrand() + "牌的" + this.getColor() + "车在以" + this.getSpeed() + "km/s的速度行驶")
+        }
+    };
+    let benz = new Vehicle("benz", "black");
+    benz.setColor("black");
+    benz.setSpeed(78);
+    benz.run();
+</script>
+</body>
+</html>
