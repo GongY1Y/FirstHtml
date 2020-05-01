@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Task5_3</title>
+</head>
+<body>
+<script>
+    let limit = 11;
+    function DoNotCreateMe(newBrand, newColor){
+        const brand = newBrand;
+        let color = newColor;
+        let speed = 0;
+        this.getBrand = function(){
+            return brand;
+        };
+        this.getColor = function(){
+            return color;
+        };
+        this.getSpeed = function(){
+            return speed;
+        };
+        this.setColor = function(newColor) {
+            color = newColor;
+        };
+        this.setSpeed = function(newSpeed) {
+            speed = newSpeed;
+        };
+    }
+    DoNotCreateMe.prototype.run = function() {
+        console.log("A "+ this.getColor() + " " + this.getBrand() + " car " +
+            "is running at the speed of " + this.getSpeed() + " km/s");
+    };
+    function getVehicle(brand, color) {
+        if(limit > 0){
+            limit --;
+            return new DoNotCreateMe(brand, color);
+        }
+        return null;
+    }
+    let ben = getVehicle("benz", "black");
+    ben.setColor("black");
+    ben.setSpeed(72);
+    ben.run();
+</script>
+</body>
+</html>
