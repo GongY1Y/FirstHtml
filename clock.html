@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>clock</title>
+</head>
+<style>
+    #map{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border: 3px solid;
+    }
+    #bus{
+        width: 20px;
+        height: 20px;
+        position: absolute;
+        background-color: orangered;
+    }
+    #station{
+        width: 20px;
+        height: 20px;
+        position: absolute;
+        background-color: cornflowerblue;
+    }
+</style>
+<body>
+    <div id="map"></div>
+</body>
+<script>
+    const WIDTH = 900, HEIGHT = 500;
+    const speed = 5;
+    let busX = 50, busY = 50;
+    const stationX = 300, stationY = 200;
+    let interval;
+
+    window.onload = function(){
+        let mapDom = document.getElementById('map');
+        mapDom.style.width = WIDTH + 'px';
+        mapDom.style.height = HEIGHT + 'px';
+
+        interval = setInterval(function () {
+            checkIsArrive();
+            mapDom.innerHTML = '<div id="bus" style="left: ' + busX + 'px; top: ' + busY + 'px"></div>' +
+                '<div id="station" style="left: ' + stationX + 'px; top: ' + stationY + 'px"></div>';
+        }, 20);
+    };
+
+    document.onkeydown = function (e) {
+        switch (e.keyCode) {
+            case 37: if(busX > 0){busX -= speed} break;
+            case 38: if(busY > 0){busY -= speed} break;
+            case 39: if(busX < WIDTH){busX += speed} break;
+            case 40: if(busY < HEIGHT){busY += speed} break;
+        }
+    };
+
+    function checkIsArrive() {
+        let nearby = Math.max(speed, 15);
+        if(Math.abs(busX - stationX) < nearby && Math.abs(busY - stationY) < nearby){
+            alert("到站了！");
+            clearInterval(interval);
+        }
+    }
+</script>
+</html>
